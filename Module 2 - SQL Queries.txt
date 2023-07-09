@@ -1,0 +1,87 @@
+1. The task is to calculate the total number of incidents reported in the given dataset.
+ 	
+	select count(id) from fatalities_cleaned
+
+
+2. The task is to calculates the year-to-year percentage changes(Round it of to nearest whole number) in the number of fatalities for each incident year, excluding the year 2022.
+
+	With table_year_incidents as (
+	select year(incident_date) as incident_year, count(*) as n_fatalities
+	from fatalities_cleaned
+	group by year(incident_date)
+	order by 1
+	)
+	select incident_year, n_fatalities,
+	lag(n_fatalities) over() as previous_year,
+	round(100 * (n_fatalities - lag(n_fatalities) over() )/
+	(lag(n_fatalities) over())) as year_to_year
+	from table_year_incidents	
+	where incident_year != 2022
+
+3. The task is to calculates the total number of fatalities that received a citation.
+
+	select citation, COUNT(id)
+	from fatalities_cleaned
+	group by citation
+
+4. The task is to calculates day of the week that reported more number of fatalities and percentage(Rounds the percentage to two decimal places).
+	SELECT 
+	day_of_week, 
+	COUNT(id) as n_fatalities, 
+   	round(((COUNT(*)/(select COUNT(*) from fatalities_cleaned)) *100),2) as percentage
+	from fatalities_cleaned
+	GROUP by day_of_week
+	ORDER by COUNT(id) DESC
+
+5. The task is to calculates the total number of fatalities during welding.
+	
+	SELECT COUNT(*) 
+	from fatalities_cleaned
+	WHERE description like '%weld%'
+
+6. The task is to calculates the last 5 fatalities during welding.
+
+	SELECT * 
+	FROM fatalities_cleaned
+	WHERE description LIKE "%weld%"
+	ORDER by incident_date DESC
+	LIMIT 5
+
+7. The task is to calculates the top 5 states which have most fatal incidents.
+
+	SELECT state,COUNT(*) 
+	from fatalities_cleaned
+	GROUP by state
+	ORDER by COUNT(*) DESC
+	LIMIT 5 
+
+8. The task is to calculates the top 5 states which have most fatal incidents happed from stabbing.
+	
+	SELECT state,COUNT(*) 
+	from fatalities_cleaned
+	WHERE description LIKE "%stabbed%"
+	GROUP by state
+	ORDER by COUNT(*) DESC
+	LIMIT 5 
+
+9. The task is to calculates the top 10 states which have most fatal incidents happed from shooting.
+	
+	SELECT state,COUNT(*) 
+	from fatalities_cleaned
+	WHERE description LIKE "%shot%"
+	GROUP by state
+	ORDER by COUNT(*) DESC
+	LIMIT 10
+
+
+10. The task is to calculates the total number of deaths caused by shooting each year.(In Decreasing order)
+
+	SELECT year(incident_date) as Year,COUNT(*) 
+	from fatalities_cleaned
+	WHERE description LIKE "%shot%"
+	GROUP by year
+	ORDER by COUNT(*) DESC
+	
+
+
+
